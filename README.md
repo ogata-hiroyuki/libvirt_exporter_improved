@@ -53,6 +53,7 @@ libvirt_domain_memory_stats_rss{domain="..."}
 libvirt_domain_memory_stats_usable{domain="..."}
 libvirt_domain_memory_stats_disk_cache{domain="..."}
 libvirt_domain_memory_stats_used_percent{domain="..."}
+libvirt_domain_nova_info{domain="..."}
 
 libvirt_up
 ```
