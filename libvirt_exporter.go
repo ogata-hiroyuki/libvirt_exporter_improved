@@ -29,7 +29,7 @@ import (
 	"github.com/libvirt/libvirt-go"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/rumanzo/libvirt_exporter_improved/libvirt_schema"
+	"github.com/bykvaadm/libvirt_exporter_improved/libvirt_schema"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -223,6 +223,13 @@ var (
 		"Amount of CPU time stolen from the domain, in ns, that is, 1/1,000,000,000 of a second, or 10−9 seconds.",
 		[]string{"domain", "cpu"},
 		nil)
+
+    libvirtDomainNovaInfoDesc = prometheus.NewDesc(
+        prometheus.BuildFQName("libvirt", "domain", "nova_info"),
+        "Nova instance metadata information.",
+        []string{"domain", "nova_name"},
+        nil,
+    )
 )
 
 // QueryCPUsResult holds the structured representative of QMP's "query-cpus" output
@@ -352,6 +359,20 @@ func CollectDomain(ch chan<- prometheus.Metric, stat libvirt.DomainStats) error 
 		prometheus.CounterValue,
 		float64(info.State),
 		domainName)
+		
+	// Report Nova metadata info
+    novaName := desc.Metadata.Instance.Name
+
+    if novaName != "" {
+        ch <- prometheus.MustNewConstMetric(
+            libvirtDomainNovaInfoDesc,
+            prometheus.GaugeValue,
+            float64(info.State),
+            domainName,
+            novaName,
+        )
+    }
+
 	// Report block device statistics.
 	for _, disk := range stat.Block {
 		var DiskSource string
@@ -716,6 +737,9 @@ func (e *LibvirtExporter) Describe(ch chan<- *prometheus.Desc) {
 	ch <- libvirtDomainMemoryStatRssDesc
 	ch <- libvirtDomainMemoryStatUsableDesc
 	ch <- libvirtDomainMemoryStatDiskCachesDesc
+	
+	// Domain nova matadata
+	ch <- libvirtDomainNovaInfoDesc
 }
 
 // Collect scrapes Prometheus metrics from libvirt.
