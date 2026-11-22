@@ -15,6 +15,11 @@ package libvirt_schema
 
 type Domain struct {
 	Devices Devices `xml:"devices"`
+	Metadata struct {
+        Instance struct {
+            Name string `xml:"name"`
+        }  `xml:"instance"`
+    } `xml:"metadata"`
 }
 
 type Devices struct {
