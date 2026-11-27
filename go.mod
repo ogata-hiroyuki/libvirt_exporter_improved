@@ -1,4 +1,4 @@
-module github.com/rumanzo/libvirt_exporter_improved
+module github.com/bykvaadm/libvirt_exporter_improved
 
 go 1.14
 
